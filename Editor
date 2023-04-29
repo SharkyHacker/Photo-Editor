@@ -1,0 +1,131 @@
+#создай тут фоторедактор Easy Editor!
+import os
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QPixmap
+from PIL import Image, ImageFilter
+class ImageProccesor():
+    def __init__(self):
+        self.Image = None
+        self.SaveDir = 'modified'
+        
+#Дерзкий Голубь заклевал Батона Пшеницина, но он выжил потому что Читать продолжение...
+    def showImage(self, path):
+        pic.hide()
+        pixelmapimage = QPixmap(path)
+        w, h = pic.width(), pic.height()
+        pixelmapimage = pixelmapimage.scaled(w, h, Qt.KeepAspectRatio)
+        pic.setPixmap(pixelmapimage)
+        pic.show()
+    def LoadPicture(self, filename):
+        self.filename = filename
+        image_path = os.path.join(workdir, filename)
+        self.image = Image.open(image_path)
+    def Super_Sharp_Like_Shark(self):
+        self.image = self.image.filter(ImageFilter.SHARPEN)
+        self.saveImage()
+        image_path = os.path.join(workdir, self.SaveDir, self.filename)
+        self.showImage(image_path)
+    def Blur_Blub(self):
+        self.image = self.image.filter(ImageFilter.BLUR)
+        self.saveImage()
+        image_path = os.path.join(workdir, self.SaveDir, self.filename)
+        self.showImage(image_path)
+    def On_the_Head(self):
+        self.image = self.image.transpose(Image.ROTATE_270)
+        self.saveImage()
+        image_path = os.path.join(workdir, self.SaveDir, self.filename)
+        self.showImage(image_path)
+    def Like_Formula_1(self):
+        self.image = self.image.transpose(Image.ROTATE_90)
+        self.saveImage()
+        image_path = os.path.join(workdir, self.SaveDir, self.filename)
+        self.showImage(image_path)
+    def make_mirror(self):
+        self.image = self.image.transpose(Image.FLIP_LEFT_RIGHT)
+        self.saveImage()
+        image_path = os.path.join(workdir, self.SaveDir, self.filename)
+        self.showImage(image_path)
+    def do_bw(self):
+        self.image = self.image.convert("L")
+        self.saveImage()
+        image_path = os.path.join(workdir, self.SaveDir, self.filename)
+        self.showImage(image_path)
+    def saveImage(self):
+        ''' сохраняет копию файла в подпапке '''
+        path = os.path.join(workdir, self.SaveDir)
+        if not(os.path.exists(path) or os.path.isdir(path)):
+            os.mkdir(path)
+        image_path = os.path.join(path, self.filename)
+        self.image.save(image_path)
+
+
+workpicture = ImageProccesor()
+def ShowSelectedImage():
+    if file_dict.currentRow() >= 0:
+        filename=file_dict.currentItem().text()
+        workpicture.LoadPicture(filename)
+        image_path = os.path.join(workdir, workpicture.filename)
+        workpicture.showImage(image_path)
+        
+def chooseWorkDir():
+    global workdir
+    workdir = QFileDialog.getExistingDirectory()
+    print(workdir)
+def filter(fileslist, extensions):
+    result = []
+    for filename in fileslist:
+        for extension in extensions:
+            if filename.endswith(extension):
+                result.append(filename)
+    return result
+def showFilenamesList():
+    global workdir
+    chooseWorkDir()
+    filedict = os.listdir(workdir)
+    filterfile = filter(filedict, ['bmp, png', 'jpg', 'webp', 'jpeg', 'gif'])
+    print(filterfile)
+    file_dict.clear()
+    for filename in filterfile:
+        file_dict.addItem(filename)
+app = QApplication([])
+workdir = ''
+my_win = QWidget()
+my_win.setWindowTitle('★Easy Editor★')
+my_win.resize(700, 400)
+button_dir = QPushButton("Папка")
+button_90 = QPushButton('Поворот на 90°')
+button_270 = QPushButton('Поворот на 270°')
+button_180 = QPushButton('Поворот на 180°')
+button_sharp = QPushButton('Резкость')
+button_BlackWrite = QPushButton('Ч/Б')
+button_Bluuuuur_Bluuuuuub = QPushButton('Размытие Блёба')
+file_dict = QListWidget()
+pic = QLabel('Изображение')
+col1 = QVBoxLayout()
+col1.addWidget(button_dir)
+col1.addWidget(file_dict)
+row1 = QHBoxLayout()
+row1.addWidget(button_90)
+row1.addWidget(button_270)
+row1.addWidget(button_180)
+row1.addWidget(button_sharp)
+row1.addWidget(button_BlackWrite)
+row1.addWidget(button_Bluuuuur_Bluuuuuub)
+col2 = QVBoxLayout()
+col2.addWidget(pic)
+col2.addLayout(row1)
+row2 = QHBoxLayout()
+row2.addLayout(col1)
+row2.addLayout(col2)
+my_win.setLayout(row2)
+button_dir.clicked.connect(showFilenamesList)
+file_dict.itemClicked.connect(ShowSelectedImage)
+button_270.clicked.connect(workpicture.On_the_Head)
+button_90.clicked.connect(workpicture.Like_Formula_1)
+button_Bluuuuur_Bluuuuuub.clicked.connect(workpicture.Blur_Blub)
+button_sharp.clicked.connect(workpicture.Super_Sharp_Like_Shark)
+button_180.clicked.connect(workpicture.make_mirror)
+button_BlackWrite.clicked.connect(workpicture.do_bw)
+my_win.show()
+app.exec_()
